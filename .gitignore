@@ -2,3 +2,6 @@ venv
 __pycache__
 MINDsmall_dev/
 MINDsmall_train/
+.idea
+Idea
+.DS_Store
