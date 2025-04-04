@@ -5,4 +5,7 @@ MINDsmall_train/
 .idea
 Idea
 .DS_Store
+*.pkl
+*.vec
+*.tsv
 *MIND/*/*.tsv
