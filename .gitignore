@@ -8,3 +8,4 @@ Idea
 *.pkl
 *.vec
 *.tsv
+*MIND/*/*.tsv

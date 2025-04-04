@@ -48,10 +48,7 @@ def evaluate_model(recommender, behaviors_df, K=10):
     """
     Evaluates a recommender model on a dataset.
     Uses the `impressions` column to determine relevant items.
-    Returns average Precision@K and Recall@K.
     """
-    precision_scores = []
-    recall_scores = []
     ndcg_scores = []
     match_stack = []
 
@@ -92,9 +89,11 @@ def evaluate_model(recommender, behaviors_df, K=10):
         precision_scores.append(precision_at_k(recommended, actual_clicked, K))
         recall_scores.append(recall_at_k(recommended, actual_clicked, K))
         ndcg_scores.append(ndcg_at_k(recommended, actual_clicked, K))
+        auc_scores.append(auc_at_k(recommended, actual_clicked, K))
+        mrr_scores.append(mrr_at_k(recommended, actual_clicked, K))
 
-    avg_precision = np.mean(precision_scores) if precision_scores else 0.0
-    avg_recall = np.mean(recall_scores) if recall_scores else 0.0
     avg_ndcg = np.mean(ndcg_scores) if ndcg_scores else 0.0
+    avg_auc = np.mean(auc_scores) if auc_scores else 0.0
+    avg_mrr = np.mean(mrr_scores) if mrr_scores else 0.0
 
     return avg_precision, avg_recall, avg_ndcg
