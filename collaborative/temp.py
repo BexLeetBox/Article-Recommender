@@ -11,7 +11,7 @@ sys.path.append(
 )
 
 from collaborative.matrixfactor import MatrixFactorization
-from collaborative.utils import create_x, preprocess_clicked, read_impressions_tsv
+from collaborative.collab_utils import create_x, preprocess_clicked, read_impressions_tsv
 
 
 # Function to split data into train and test sets
