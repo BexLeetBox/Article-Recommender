@@ -57,7 +57,7 @@ def mrr_at_k(recommended, actual_clicked, K=5):
             return 1.0 / (i + 1)
     return 0.0
 
-def evaluate_model(recommender, behaviors_df, K=10):
+def evaluate_model(recommender, behaviors_df, K=5):
     """
     Evaluates a recommender model on a dataset.
     Uses the `impressions` column to determine relevant items.
