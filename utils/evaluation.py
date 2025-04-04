@@ -1,5 +1,8 @@
+import sys
+
 import numpy as np
 import pandas as pd
+from IPython.display import clear_output
 
 def precision_at_k(recommended, actual_clicked, K=10):
     """
@@ -9,6 +12,7 @@ def precision_at_k(recommended, actual_clicked, K=10):
         return 0.0
     return (len(set(recommended[:K]) & set(actual_clicked))) / K
 
+
 def recall_at_k(recommended, actual_clicked, K=10):
     """
     Computes Recall@K (how many of the relevant items were recommended).
@@ -17,11 +21,13 @@ def recall_at_k(recommended, actual_clicked, K=10):
         return 0.0
     return (len(set(recommended[:K]) & set(actual_clicked))) / len(actual_clicked)
 
+
 def dcg_at_k(recommended, actual_clicked, K=10):
     """
     Computes Discounted Cumulative Gain (DCG) at K.
     """
     return sum(1 / np.log2(i + 2) for i, item in enumerate(recommended[:K]) if item in actual_clicked)
+
 
 def idcg_at_k(actual_clicked, K=10):
     """
@@ -30,11 +36,13 @@ def idcg_at_k(actual_clicked, K=10):
     num_relevant = min(len(actual_clicked), K)
     return sum(1 / np.log2(i + 2) for i in range(num_relevant)) or 1  # Avoid division by zero
 
+
 def ndcg_at_k(recommended, actual_clicked, K=10):
     """
     Computes Normalized Discounted Cumulative Gain (NDCG) at K.
     """
     return dcg_at_k(recommended, actual_clicked, K) / idcg_at_k(actual_clicked, K)
+
 
 def evaluate_model(recommender, behaviors_df, K=10):
     """
@@ -45,23 +53,42 @@ def evaluate_model(recommender, behaviors_df, K=10):
     precision_scores = []
     recall_scores = []
     ndcg_scores = []
+    match_stack = []
 
     for _, row in behaviors_df.iterrows():
         user_id = row["user_id"]
-        if pd.isna(row["impressions"]):  # Skip users with no impressions
+        if pd.isna(row["impressions"]):
             continue
 
-        # Extract clicked articles from impressions (those marked with `-1`)
+        # Extract clicked articles
         actual_clicked = {item.split("-")[0] for item in row["impressions"].split() if item.endswith("-1")}
-
         if not actual_clicked:
             continue
 
-        # Get recommendations from the model
+        # Get recommendations
         recommended = recommender.recommend(user_id, N=K) or []
         recommended = recommended[:K]
 
-        # Compute precision and recall
+        matches = set(recommended) & set(actual_clicked)
+        if matches:
+            match_stack.append((user_id, matches))  # Store user & matched items
+
+
+
+        clear_output(wait=True)
+
+        # Debug: Print recommendations vs. actual clicks
+        print(f"\n User {user_id}")
+        print(f"    Clicked: {actual_clicked}")
+        print(f"    Recommended: {recommended}")
+        #print(f"    Matches: {set(recommended) & set(actual_clicked)}")
+        print(f"   🎯 Matches: {matches}")
+        if not set(recommended) & set(actual_clicked):
+            print("❌ No matches found for this user!")
+
+        sys.stdout.flush()
+
+        # Compute scores
         precision_scores.append(precision_at_k(recommended, actual_clicked, K))
         recall_scores.append(recall_at_k(recommended, actual_clicked, K))
         ndcg_scores.append(ndcg_at_k(recommended, actual_clicked, K))
