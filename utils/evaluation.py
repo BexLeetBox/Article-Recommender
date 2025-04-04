@@ -12,7 +12,7 @@ def idcg_at_k(actual_clicked, K=5):
     Computes Ideal Discounted Cumulative Gain (IDCG) at K.
     """
     num_relevant = min(len(actual_clicked), K)
-    return sum(1 / np.log2(i + 2) for i in range(num_relevant)) or 1  # Avoid division by zero
+    return sum(1 / np.log2(i + 2) for i in range(num_relevant)) or 1
 
 def ndcg_at_k(recommended, actual_clicked, K=5):
     """
