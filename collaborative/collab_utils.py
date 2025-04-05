@@ -14,22 +14,14 @@ def read_impressions_tsv(path="./MIND/train/behaviors.tsv"):
     ) 
 
 def _split_clicked(x):
-  return re.findall(r"(\d+)-1", x)
+  return re.findall(r"(\w+)-1", x)
 
-def _str2int(x):
-  m = re.search(r"\d+", x)
-  if not m:
-    raise Exception("didn't find news id")
-  return int(m.group())
 
-# ignore articles that have not been clicked
 def preprocess_clicked(df: DataFrame, rows=100_000):
   df["news_id"] = df["impressions"].apply(_split_clicked)
   df = df.explode("news_id").reset_index()
   df = df.head(rows)
 
-  df["user_id"] = df["user_id"].apply(_str2int)
-  df["news_id"] = df["news_id"].apply(_str2int)
   df["click"] = 1
 
   return df[["user_id", "news_id", "click"]]
