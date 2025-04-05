@@ -134,7 +134,7 @@ if __name__ == "__main__":
     model, uid2index, nid2index, index2uid, index2nid = run_news_recommender(impressions)
     
     # Get recommendations for a user
-    user_id = impressions["userId"].iloc[0]  # Example: first user in the dataset
+    user_id = impressions["user_id"].iloc[0]  # Example: first user in the dataset
     recommendations = get_recommendations_for_user(user_id, model, uid2index, nid2index, index2nid)
     
     print(f"Top recommendations for user {user_id}:")

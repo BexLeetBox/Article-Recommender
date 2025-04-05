@@ -9,8 +9,8 @@ def read_impressions_tsv(path="./MIND/train/behaviors.tsv"):
       path,
       sep="\t",
       header=None,
-      names=["impressionId", "userId", "timestamp", "history", "impressions"],
-      usecols=["userId", "impressions"]
+      names=["impressionId", "user_id", "timestamp", "history", "impressions"],
+      usecols=["user_id", "history", "impressions"]
     ) 
 
 def _split_clicked(x):
@@ -24,33 +24,46 @@ def _str2int(x):
 
 # ignore articles that have not been clicked
 def preprocess_clicked(df: DataFrame, rows=100_000):
-  df["newsId"] = df["impressions"].apply(_split_clicked)
-  df = df.explode("newsId").reset_index()
+  df["news_id"] = df["impressions"].apply(_split_clicked)
+  df = df.explode("news_id").reset_index()
   df = df.head(rows)
 
-  df["userId"] = df["userId"].apply(_str2int)
-  df["newsId"] = df["newsId"].apply(_str2int)
+  df["user_id"] = df["user_id"].apply(_str2int)
+  df["news_id"] = df["news_id"].apply(_str2int)
   df["click"] = 1
 
-  return df[["userId", "newsId", "click"]]
+  return df[["user_id", "news_id", "click"]]
+
+# ignore articles that have not been clicked
+def preprocess_history(df: DataFrame, rows=100_000):
+
+  df = df.dropna()
+
+  df["news_id"] = df["history"].str.split()
+  df = df.explode("news_id").reset_index()
+  df = df.head(rows)
+
+  df["click"] = 1
+
+  return df[["user_id", "news_id", "click"]]
 
 
 # Create space efficient sparse matrix and index mappers
 def create_x(df: DataFrame):
-  user_ids = df["userId"].unique()
-  news_ids = df["newsId"].unique()
+  user_ids = df["user_id"].unique()
+  news_ids = df["news_id"].unique()
 
   M = len(user_ids)
   N = len(news_ids)
 
   uid2index = {id: i for i, id in enumerate(user_ids)}
-  nid2index = {id: i for i, id in enumerate(news_ids)}    # Create sparse matrix and mappers
+  nid2index = {id: i for i, id in enumerate(news_ids)}
     
   index2uid = {v: k for k, v in uid2index.items()}
   index2nid = {v: k for k, v in nid2index.items()}
 
-  rows = [uid2index[uid] for uid in df["userId"]]
-  cols = [nid2index[nid] for nid in df["newsId"]]
+  rows = [uid2index[uid] for uid in df["user_id"]]
+  cols = [nid2index[nid] for nid in df["news_id"]]
 
   data = df["click"]
 

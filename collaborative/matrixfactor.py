@@ -120,8 +120,8 @@ raw_impressions = pd.read_csv(
     "./MIND/train/behaviors.tsv",
     sep='\t',
     header=None,
-    names=["impressionId", "userId", "time", "history", "impressions"],
-    usecols=["userId", "history", "impressions"]
+    names=["impressionId", "user_id", "time", "history", "impressions"],
+    usecols=["user_id", "history", "impressions"]
   )
 
 import re
@@ -144,18 +144,24 @@ def combine_interractions(x):
 
 impressions = impressions.dropna()
 
-impressions["newsId"] = impressions.apply(combine_interractions, axis=1)
-impressions = impressions.explode("newsId").reset_index()
-impressions = impressions.head(100_000)
+impressions["news_id"] = impressions.apply(combine_interractions, axis=1)
+impressions = impressions.explode("news_id").reset_index()
+impressions = impressions.head(10_000)
 
-raw_impressions = raw_impressions[raw_impressions["userId"].isin(impressions["userId"])]
+impressions = impressions[["user_id", "news_id", "clicked"]]
 
-print(raw_impressions.info())
+
+print(impressions.head())
+print(impressions.info())
+
+
+raw_impressions = raw_impressions[raw_impressions["user_id"].isin(impressions["user_id"])]
+
 
 
 impressions["click"] = 1
 
-impressions = impressions[["userId", "newsId", "click"]]
+impressions = impressions[["user_id", "news_id", "click"]]
 
 print("start training...")
 
