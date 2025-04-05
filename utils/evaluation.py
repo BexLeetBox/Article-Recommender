@@ -72,7 +72,13 @@ def evaluate_model(recommender, behaviors_df, K=5):
             continue
 
         # Extract clicked articles from impressions (those marked with `-1`)
-        actual_clicked = {item.split("-")[0] for item in row["impressions"].split() if item.endswith("-1")}
+        # actual_clicked = {item.split("-")[0] for item in row["impressions"].split() if item.endswith("-1")}
+        actual_clicked = {
+            item.split("-")[0] for item in row["impressions"].split()
+            if item.split("-")[1] == "1"
+        }
+
+
 
         if not actual_clicked:
             continue
