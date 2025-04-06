@@ -71,6 +71,9 @@ def evaluate_model(recommender, behaviors_df, K=5):
         if pd.isna(row["impressions"]):  # Skip users with no impressions
             continue
 
+        # Parse impressions
+        impression_articles = [item.split("-")[0] for item in row["impressions"].split()]
+
         # Extract clicked articles from impressions (those marked with `-1`)
         # actual_clicked = {item.split("-")[0] for item in row["impressions"].split() if item.endswith("-1")}
         actual_clicked = {
@@ -78,13 +81,11 @@ def evaluate_model(recommender, behaviors_df, K=5):
             if item.split("-")[1] == "1"
         }
 
-
-
         if not actual_clicked:
             continue
 
         # Get recommendations from the model
-        recommended = recommender.recommend(user_id, N=K) or []
+        recommended = recommender.recommend(user_id, candidate_articles=impression_articles, N=K) or []
         recommended = recommended[:K]
 
         ndcg_scores.append(ndcg_at_k(recommended, actual_clicked, K))
