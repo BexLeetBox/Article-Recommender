@@ -6,3 +6,7 @@ MINDsmall_train/
 Idea
 .DS_Store
 backend/MIND/*.tsv
+*.pkl
+*.vec
+*.tsv
+*MIND/*/*.tsv
